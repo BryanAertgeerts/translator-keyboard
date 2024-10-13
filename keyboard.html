@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simātsan Keyboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #symbolContainer {
+            width: 800px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .symbol {
+            display: inline-block;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            text-align: center;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            width: 70px;
+            margin-bottom: 10px;
+            color: #333; /* Text color */
+        }
+
+        .symbol img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .symbol:hover {
+            opacity: 0.7;
+        }
+
+        .output-box {
+            display: inline-block;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            padding: 10px;
+            white-space: nowrap;
+            vertical-align: top;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        .large-space {
+            width: 150px;
+            height: 50px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        #nightModeButton, #backspaceButton {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ccc;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Night mode styles */
+        .night-mode {
+            background-color: #333;
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .night-mode .symbol:hover {
+            opacity: 0.7;
+        }
+
+        .night-mode .output-box {
+            background-color: #333;
+            color: #fff;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <button id="nightModeButton">Night Mode</button>
+    <button id="backspaceButton">Backspace</button>
+
+    <div id="symbolContainer">
+        <!-- Hier komen de afbeeldingen -->
+    </div>
+
+    <script>
+        var imagePaths = [
+            '1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png', '10.png',
+            '11.png', '12.png', '13.png', '14.png', '30.png','15.png', '16.png', '17.png', '18.png', '19.png', '20.png',
+            '21.png', '22.png', '23.png', '24.png', '25.png', '26.png', '27.png', '28.png', '29.png',
+            'space.png' 
+        ];
+
+        var buttonTexts = [
+            'p', 'b', 't', 'bt', 'k', 'g', 's', 'hl', 'sh', 'h', 'ts', 'tl', 'sh', 'j', 'm', 'n', 'r', 'l', 'y', 'w', 'i', 'ī', 'e', 'ē', 'a', 'ā', 'u', 'ū', 'o', 'ō', 'space'
+        ];
+
+        var symbolContainer = document.getElementById('symbolContainer');
+        var outputContainer;
+        var spaceCounter = 0; 
+        var firstSpace = true; 
+
+        var nightModeButton = document.getElementById('nightModeButton');
+        var backspaceButton = document.getElementById('backspaceButton');
+        var nightMode = false;
+
+        nightModeButton.addEventListener('click', function() {
+            nightMode = !nightMode;
+            if (nightMode) {
+                enableNightMode();
+            } else {
+                disableNightMode();
+            }
+        });
+
+        function enableNightMode() {
+            document.body.classList.add('night-mode');
+            nightModeButton.style.backgroundColor = '#fff';
+            nightModeButton.style.color = '#333';
+            backspaceButton.style.backgroundColor = '#fff';
+            backspaceButton.style.color = '#333';
+        }
+
+        function disableNightMode() {
+            document.body.classList.remove('night-mode');
+            nightModeButton.style.backgroundColor = '#ccc';
+            nightModeButton.style.color = '#333';
+            backspaceButton.style.backgroundColor = '#ccc';
+            backspaceButton.style.color = '#333';
+        }
+
+        imagePaths.forEach(function(path, index) {
+            if (index % 11 === 0) {
+                var row = document.createElement('div');
+                row.classList.add('row');
+                symbolContainer.appendChild(row);
+            }
+
+            var imageDiv = document.createElement('div');
+            imageDiv.classList.add('symbol');
+            var img = document.createElement('img');
+            img.src = path;
+            imageDiv.appendChild(img);
+
+            var textNode = document.createElement('div');
+            textNode.textContent = buttonTexts[index];
+            imageDiv.appendChild(textNode);
+
+            if (path !== 'space.png') {
+                imageDiv.addEventListener('click', function() {
+                    if (!outputContainer) {
+                        createNewOutputBox();
+                    }
+                    var imgClone = img.cloneNode(true);
+                    outputContainer.appendChild(imgClone);
+                    outputContainer.appendChild(document.createElement('br','br','br'));
+                });
+            } else {
+                imageDiv.addEventListener('click', function() {
+                    spaceCounter++;
+                    if (!outputContainer) {
+                        createNewOutputBox();
+                    }
+                    var space = document.createElement('div');
+                    space.classList.add('large-space');
+                    outputContainer.appendChild(space);
+                    if (spaceCounter % 3 === 0 && !firstSpace) {
+                        createNewOutputBox();
+                    }else if(firstSpace){
+                      firstSpace = false; 
+                    }
+                });
+            }
+            var currentRow = symbolContainer.lastChild;
+            currentRow.appendChild(imageDiv);
+        });
+
+        backspaceButton.addEventListener('click', function() {
+            if (outputContainer) {
+                var children = outputContainer.childNodes;
+                var lastChild = children[children.length - 1];
+                if (lastChild.tagName === 'IMG' || lastChild.tagName === 'BR' || lastChild.classList.contains('large-space')) {
+                    outputContainer.removeChild(lastChild);
+                }
+            }
+        });
+
+        function createNewOutputBox() {
+            outputContainer = document.createElement('div');
+            outputContainer.classList.add('output-box');
+            symbolContainer.appendChild(outputContainer);
+        }
+    </script>
+</body>
+</html>
